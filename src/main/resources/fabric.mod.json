@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "${mod_id}",
+	"version": "${version}",
+	"name": "${mod_name}",
+	"description": "${description}",
+	"authors": [
+		"Danny (K0tatkoo)"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/tally-hud",
+		"sources": "https://github.com/K0tatkoo/tally-hud",
+		"issues": "https://github.com/K0tatkoo/tally-hud/issues"
+	},
+	"license": "MIT",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"dev.kotatko.tally.TallyClient"
+		],
+		"modmenu": [
+			"dev.kotatko.tally.compat.ModMenuCompat"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.0",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	},
+	"mixins": [
+		"${mod_id}.mixins.json"
+	],
+	"icon": "assets/${mod_id}/icon.png",
+	"suggests": {
+		"modmenu": "*"
+	}
+}

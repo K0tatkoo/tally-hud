@@ -1,0 +1,142 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+plugins {
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+}
+
+version = project.mod_version
+
+// More than one edition can be built from this source tree. Shared code is in src/main; an edition adds
+// src/<edition>/{java,resources,lang,gametest} and describes itself in src/<edition>/edition.properties.
+// Pick one with -Pedition=<name>; without it, "personal" when that folder exists, else "public".
+def edition = (project.findProperty('edition') ?: (file('src/personal').exists() ? 'personal' : 'public')).toString()
+def editionFile = file("src/${edition}/edition.properties")
+if (!editionFile.exists()) {
+	throw new GradleException("No edition '${edition}': ${editionFile} does not exist")
+}
+def ed = new Properties()
+editionFile.withInputStream { ed.load(it) }
+logger.lifecycle("Tally: building the ${edition} edition (${ed.name}, mod id ${ed.mod_id})")
+
+base {
+	archivesName = ed.archive
+}
+
+fabricApi {
+	// `./gradlew runClientGameTest` boots a real client, flies a scripted sortie and saves screenshots.
+	configureTests {
+		createSourceSet = true
+		modId = 'tally-gametest'
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = true
+	}
+}
+
+sourceSets {
+	main {
+		java.srcDir "src/${edition}/java"
+		resources.srcDir "src/${edition}/resources"
+	}
+	gametest {
+		java.srcDir "src/${edition}/gametest"
+	}
+}
+
+// `-PextraMods=/some/folder` loads that folder's jars into the test client as well, to fly the
+// test alongside other mods (Sodium, Iris, ...). The run directory itself is wiped before each run.
+loom.runs.matching { it.name == 'clientGameTest' }.configureEach {
+	if (project.hasProperty('extraMods')) {
+		property 'fabric.modsFolder', project.property('extraMods').toString()
+	}
+}
+
+repositories {
+	maven {
+		name = 'TerraformersMC'
+		url = 'https://maven.terraformersmc.com/releases'
+		content {
+			includeGroup 'com.terraformersmc'
+		}
+	}
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	// Optional: only its API is compiled against, for the "configure" button in the mod list.
+	compileOnly("com.terraformersmc:modmenu:${project.modmenu_version}") {
+		transitive = false
+	}
+
+	testImplementation platform('org.junit:junit-bom:5.13.4')
+	testImplementation 'org.junit.jupiter:junit-jupiter'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+def modProps = [
+	version: project.version,
+	mod_id: ed.mod_id,
+	mod_name: ed.name,
+	description: ed.description,
+]
+
+processResources {
+	inputs.properties modProps
+	def modId = ed.mod_id
+	def langExtra = file("src/${edition}/lang/en_us.json")
+	inputs.file langExtra
+	inputs.file editionFile
+
+	filesMatching("fabric.mod.json") {
+		expand modProps
+	}
+	// The assets and the mixin config are named after the mod id, so the two editions never share a
+	// namespace with each other or with another mod called "tally".
+	filesMatching("assets/tally/sounds.json") {
+		filter { it.replace('"tally:', "\"${modId}:") }
+	}
+	eachFile { f ->
+		if (f.path.startsWith('assets/tally/')) {
+			f.path = "assets/${modId}/" + f.path.substring('assets/tally/'.length())
+		} else if (f.path == 'tally.mixins.json') {
+			f.path = "${modId}.mixins.json"
+		}
+	}
+	includeEmptyDirs = false
+
+	// One language file: the shared strings, then the edition's own (which win on a clash).
+	doLast {
+		def out = new File(destinationDir, "assets/${modId}/lang/en_us.json")
+		def merged = new JsonSlurper().parse(out) as Map
+		merged.putAll(new JsonSlurper().parse(langExtra) as Map)
+		// The key category is registered as <mod id>:main.
+		def category = merged.remove('key.category.tally.main')
+		merged.put("key.category.${modId}.main".toString(), category)
+		out.setText(JsonOutput.prettyPrint(JsonOutput.toJson(merged)) + '\n', 'UTF-8')
+	}
+}
+
+tasks.named('processGametestResources') {
+	inputs.properties modProps
+	filesMatching("fabric.mod.json") {
+		expand modProps
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 25
+	it.options.encoding = 'UTF-8'
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+test {
+	useJUnitPlatform()
+}

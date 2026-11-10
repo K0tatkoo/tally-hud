@@ -1,0 +1,130 @@
+{
+	"lock": {
+		"subtitle": "subtitles.tally.lock",
+		"sounds": [
+			{
+				"name": "tally:lock"
+			}
+		]
+	},
+	"unlock": {
+		"subtitle": "subtitles.tally.unlock",
+		"sounds": [
+			{
+				"name": "tally:unlock"
+			}
+		]
+	},
+	"no_target": {
+		"subtitle": "subtitles.tally.no_target",
+		"sounds": [
+			{
+				"name": "tally:no_target"
+			}
+		]
+	},
+	"contact": {
+		"subtitle": "subtitles.tally.contact",
+		"sounds": [
+			{
+				"name": "tally:contact"
+			}
+		]
+	},
+	"spike": {
+		"subtitle": "subtitles.tally.spike",
+		"sounds": [
+			{
+				"name": "tally:spike"
+			}
+		]
+	},
+	"stall": {
+		"subtitle": "subtitles.tally.stall",
+		"sounds": [
+			{
+				"name": "tally:stall"
+			}
+		]
+	},
+	"caution": {
+		"subtitle": "subtitles.tally.caution",
+		"sounds": [
+			{
+				"name": "tally:caution"
+			}
+		]
+	},
+	"whoop": {
+		"subtitle": "subtitles.tally.whoop",
+		"sounds": [
+			{
+				"name": "tally:whoop"
+			}
+		]
+	},
+	"hud_on": {
+		"subtitle": "subtitles.tally.hud_on",
+		"sounds": [
+			{
+				"name": "tally:hud_on"
+			}
+		]
+	},
+	"hud_off": {
+		"subtitle": "subtitles.tally.hud_off",
+		"sounds": [
+			{
+				"name": "tally:hud_off"
+			}
+		]
+	},
+	"pull_up": {
+		"subtitle": "subtitles.tally.pull_up",
+		"sounds": [
+			{
+				"name": "tally:pull_up"
+			}
+		]
+	},
+	"altitude": {
+		"subtitle": "subtitles.tally.altitude",
+		"sounds": [
+			{
+				"name": "tally:altitude"
+			}
+		]
+	},
+	"terrain": {
+		"subtitle": "subtitles.tally.terrain",
+		"sounds": [
+			{
+				"name": "tally:terrain"
+			}
+		]
+	},
+	"caution_voice": {
+		"subtitle": "subtitles.tally.caution_voice",
+		"sounds": [
+			{
+				"name": "tally:caution_voice"
+			}
+		]
+	},
+	"warning_voice": {
+		"subtitle": "subtitles.tally.warning_voice",
+		"sounds": [
+			{
+				"name": "tally:warning_voice"
+			}
+		]
+	},
+	"bingo": {
+		"subtitle": "subtitles.tally.bingo",
+		"sounds": [
+			{
+				"name": "tally:bingo"
+			}
+		]
+	}
+}
